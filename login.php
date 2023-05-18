@@ -1,3 +1,10 @@
+<?php
+include "FrontendHandler/auth.php";
+
+if (auth()){
+    header('location: ../index.php');
+}
+?>
 <!doctype html>
 <html lang="en">
 <?php include "includes/header.php";?>

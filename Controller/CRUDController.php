@@ -2,7 +2,8 @@
 
 namespace Controller;
 
-include "../Helpers/DBConnection.php";
+//include "../Helpers/DBConnection.php";
+include __DIR__."/../Helpers/DBConnection.php";
 
 use DBConnection;
 use PDO;
@@ -17,6 +18,17 @@ class CRUDController {
         $this->conn = $conn->connect();
     }
 
+    public function index ($query)
+    {
+        try{
+            $statement = $this->conn->prepare($query);
+            $statement->execute();
+            $statement->setFetchMode(PDO::FETCH_OBJ);
+            return $statement->fetchAll();
+        }catch (PDOException $e){
+            return "Data not found".$e->getMessage();
+        }
+    }
     /**
      * @param $query
      * @return string

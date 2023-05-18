@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 include "../Controller/CRUDController.php";
 
 use Controller\CRUDController;
@@ -13,7 +15,8 @@ $crud = new CRUDController();
 $data = $crud->show($query);
 if ($data){
     if ($data->password == $password){
-        echo "Login Success";
+       $_SESSION['email'] = $email;
+       header('location: ../index.php');
     }else {
         echo 'Email/password doesn\'t Match';
     }
