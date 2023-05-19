@@ -13,6 +13,17 @@ $query = "SELECT t.id, t.title, t.description, t.status, t.deadline, t.created_a
 $crud = new CRUDController();
 $results = $crud->index($query);
 
+if (isset($_POST['delete'])){
+    $id = $_POST['id'];
+
+    $delete_query = "DELETE FROM tasks WHERE id = $id";
+
+    $crud->destroy($delete_query);
+    $_SESSION['msg'] = "Task Deleted successfully";
+    $_SESSION['class'] = 'danger';
+    header('location: index.php');
+}
+
 //echo "<pre>";
 //print_r($results);
 //die('done');
@@ -30,9 +41,22 @@ $results = $crud->index($query);
             <div class="col-md-9">
                 <div class="card h-100">
                     <div class="card-header">
-                        <h4 class="mb-0">Task List</h4>
+                        <div class="d-flex justify-content-between">
+                            <h4 class="mb-0">Task List</h4>
+                            <a href="task_create.php"><button class="btn btn-sm btn-success"><i class="fa-solid fa-plus"></i></button></a>
+                        </div>
                     </div>
                     <div class="card-body">
+                        <?php if (isset($_SESSION['msg'])) { ?>
+                            <div class="alert alert-<?php echo $_SESSION['class'] ?>">
+                                <p class="mb-0">
+                                    <?php
+                                    echo $_SESSION['msg'];
+                                    unset($_SESSION['msg']);
+                                    ?>
+                                </p>
+                            </div>
+                        <?php } ?>
                         <table class="table table-sm table-bordered table-hover table-stripped">
                             <thead>
                                 <tr>
@@ -57,7 +81,7 @@ $results = $crud->index($query);
                                     <td class="align-middle"><?php echo $result->title ?></td>
                                     <td class="align-middle">
                                         <?php echo substr($result->description, 0, 30) ?>...
-                                        <a href="">Read More</a>
+                                        <button style="border: none; background: transparent; color: darkcyan" data-bs-toggle="modal" data-bs-target="#details_<?php echo $result->id ?>">Read More</button>
                                     </td>
                                     <td class="align-middle"><?php echo $result->status == 1 ? 'Active' : 'Inactive' ?></td>
                                     <td class="align-middle">
@@ -71,11 +95,31 @@ $results = $crud->index($query);
                                     </td>
                                     <td class="align-middle"><?php echo date('d M, Y h:i:sA', strtotime($result->updated_at)) ?></td>
                                     <td class="align-middle">
-                                        <a href=""><button class="btn btn-info btn-sm"><i class="fa-solid fa-eye"></i></button></a>
-                                        <a href=""><button class="btn btn-warning btn-sm"><i class="fa-solid fa-edit"></i></button></a>
-                                        <a href=""><button class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button></a>
+                                        <a href="task_show.php?id=<?php echo $result->id ?>"><button class="btn btn-info btn-sm"><i class="fa-solid fa-eye"></i></button></a>
+                                        <a href="task_edit.php?id=<?php echo $result->id ?>"><button class="btn btn-warning btn-sm"><i class="fa-solid fa-edit"></i></button></a>
+                                        <form action="" method="post">
+                                            <input type="hidden" name="id" value="<?php echo $result->id ?>">
+                                            <button onclick="return confirm('Are You Sure?')" type="submit" name="delete" class="btn btn-danger btn-sm"><i class="fa-solid fa-trash"></i></button>
+                                        </form>
                                     </td>
                                 </tr>
+                                    <!-- Modal -->
+                                    <div class="modal fade" id="details_<?php echo $result->id ?>" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h1 class="modal-title fs-5" id="staticBackdropLabel">Task Description</h1>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <?php echo $result->description ?>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                             <?php } ?>
                             </tbody>
                         </table>

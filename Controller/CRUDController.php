@@ -18,6 +18,10 @@ class CRUDController {
         $this->conn = $conn->connect();
     }
 
+    /**
+     * @param $query
+     * @return array|string
+     */
     public function index ($query)
     {
         try{
@@ -45,6 +49,20 @@ class CRUDController {
 
     /**
      * @param $query
+     * @return string
+     */
+    public function update($query)
+    {
+        try {
+            $this->conn->query($query);
+            return true;
+        }catch (PDOException $e){
+            return "Data not inserted".$e->getMessage();
+        }
+    }
+
+    /**
+     * @param $query
      * @return mixed|string
      */
     public function show ($query)
@@ -54,6 +72,20 @@ class CRUDController {
             $statement->execute();
             $statement->setFetchMode(PDO::FETCH_OBJ);
             return $statement->fetch();
+        }catch (PDOException $e){
+            return "Data not inserted".$e->getMessage();
+        }
+    }
+
+    /**
+     * @param $query
+     * @return string
+     */
+    public function destroy($query)
+    {
+        try {
+            $this->conn->query($query);
+            return true;
         }catch (PDOException $e){
             return "Data not inserted".$e->getMessage();
         }
