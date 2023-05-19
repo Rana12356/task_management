@@ -24,6 +24,15 @@ if (isset($_POST['delete'])){
     header('location: index.php');
 }
 
+if (isset($_GET['filter'])){
+    $column = isset($_GET['column']) ? $_GET['column'] : 'created_at';
+    $order_by = isset($_GET['order_by']) ? $_GET['order_by'] : 'asc';
+    $search = isset($_GET['search']) ? $_GET['search'] : '';
+
+    $search_query = "SELECT t.id, t.title, t.description, t.status, t.deadline, t.created_at, t.updated_at, u.id as userId, u.first_name, u.last_name FROM tasks as t LEFT JOIN users as u ON t.user_id = u.id WHERE $column LIKE '%".$search."%' ORDER BY $column $order_by";
+    $results = $crud->index($search_query);
+}
+
 //echo "<pre>";
 //print_r($results);
 //die('done');
@@ -57,7 +66,43 @@ if (isset($_POST['delete'])){
                                 </p>
                             </div>
                         <?php } ?>
-                        <table class="table table-sm table-bordered table-hover table-stripped">
+                        <form action="" method="get">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <select name="column" class="form-select form-select-sm" id="">
+                                        <option <?php if (isset($column) && $column == 'title'){echo 'selected';}  ?> value="title">Title</option>
+                                        <option <?php if (isset($column) && $column == 'status'){echo 'selected';}  ?> value="status">Status</option>
+                                        <option <?php if (isset($column) && $column == 'deadline'){echo 'selected';}  ?> value="deadline">Deadline</option>
+                                        <option <?php
+                                        if (isset($column))
+                                        {
+                                            if ($column == 'created_at'){
+                                                echo 'selected';
+                                            }
+                                        }else{
+                                            echo 'selected';
+                                        }
+                                        ?> value="created_at">Created At</option>
+                                        <option <?php if (isset($column) && $column == 'updated_at'){echo 'selected';}  ?> value="updated_at">Updated At</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select name="order_by" class="form-select form-select-sm" id="">
+                                        <option value="asc">Ascending</option>
+                                        <option value="desc">Descending</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="search" name="search" class="form-control form-control-sm" placeholder="Search...">
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="d-grid">
+                                        <button class="btn btn-sm btn-success" name="filter" type="submit">Submit</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                        <table class="table table-sm table-bordered table-hover table-stripped mt-4">
                             <thead>
                                 <tr>
                                     <th class="align-middle">SL</th>
